@@ -1,0 +1,19 @@
+# travis-ci test main source and push to mirrors
+
+language: bash
+sudo: enabled
+
+jobs:
+  include:
+    - os: linux
+      dist: focal
+      before_install: sudo apt-get update
+
+install:
+  - sudo bash -c "$(curl -LSs https://github.com/systemmgr/installer/raw/master/install.sh)" && systemmgr install installer
+  - sudo ./install.sh
+
+notifications:
+  email:
+    on_failure: never
+    on_success: never

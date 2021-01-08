@@ -129,6 +129,7 @@ failexitcode
 
 run_postinst() {
   systemmgr_run_postinst
+  if_os_id debian && replace "$APPDIR/nginx.conf" apache "www-data"
   ln_sf "$APPDIR" "/etc/nginx"
   system_service_enable nginx
 }
