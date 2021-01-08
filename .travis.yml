@@ -11,7 +11,7 @@ jobs:
 
 install:
   - sudo bash -c "$(curl -LSs https://github.com/systemmgr/installer/raw/master/install.sh)" && systemmgr install installer
-  - sudo ./install.sh
+  - systemmgr install nginx
 
 notifications:
   email:
