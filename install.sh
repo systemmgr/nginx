@@ -65,6 +65,13 @@ show_optvars "$@"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+# Requires root - no point in continuing
+
+sudoreq # sudo required
+#sudorun  # sudo optional
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 # end with a space
 
 APP="nginx "
@@ -133,8 +140,8 @@ failexitcode
 
 run_postinst() {
   systemmgr_run_postinst
-  if_os_id debian && replace "$APPDIR/nginx.conf" apache "www-data"
   cp_rf "$APPDIR"/. "/etc/nginx/"
+  if_os_id debian && replace "$APPDIR/nginx.conf" apache "www-data"
   system_service_enable nginx
 }
 

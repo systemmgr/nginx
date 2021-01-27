@@ -1,11 +1,11 @@
-## Template  
+## nginx  
   
-Template is a shell designed for interactive use  
+nginx is a shell designed for interactive use  
   
 Automatic install/update:
 
 ```shell
-bash -c "$(curl -LSs https://github.com/systemmgr/Template/raw/master/install.sh)"
+bash -c "$(curl -LSs https://github.com/systemmgr/nginx/raw/master/install.sh)"
 ```
 
 Manual install:
@@ -15,28 +15,28 @@ requires:
 Debian based:
 
 ```shell
-apt install Template
+apt install nginx
 ```  
 
 Fedora Based:
 
 ```shell
-yum install Template
+yum install nginx
 ```  
 
 Arch Based:
 
 ```shell
-pacman -S Template
+pacman -S nginx
 ```  
 
 MacOS:  
 
 ```shell
-brew install Template
+brew install nginx
 ```
   
 <p align=center>
-  <a href="https://wiki.archlinux.org/index.php/Template" target="_blank" rel="noopener noreferrer">Template wiki</a>  |  
-  <a href="http://Template.sourceforge.net" target="_blank" rel="noopener noreferrer">Template site</a>
+  <a href="https://wiki.archlinux.org/index.php/nginx" target="_blank" rel="noopener noreferrer">nginx wiki</a>  |  
+  <a href="http://nginx.sourceforge.net" target="_blank" rel="noopener noreferrer">nginx site</a>
 </p>  
