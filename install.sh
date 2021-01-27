@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-APPNAME="template"
+APPNAME="nginx"
 USER="${SUDO_USER:-${USER}}"
 HOME="${USER_HOME:-${HOME}}"
 
@@ -11,7 +11,7 @@ HOME="${USER_HOME:-${HOME}}"
 # @Created         : Fr, Aug 28, 2020, 00:00 EST
 # @License         : WTFPL
 # @Copyright       : Copyright (c) CasjaysDev
-# @Description     : installer script for Template
+# @Description     : installer script for nginx
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -44,15 +44,16 @@ scripts_check
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Defaults
-APPNAME="${APPNAME:-template}"
+APPNAME="${APPNAME:-nginx}"
 APPDIR="${APPDIR:-$SHARE/CasjaysDev/systemmgr}/$APPNAME"
+INSTDIR="${INSTDIR}"
 REPO="${SYSTEMMGRREPO:-https://github.com/systemmgr}/${APPNAME}"
 REPORAW="${REPORAW:-$REPO/raw}"
-APPVERSION="$(curl -LSs $REPORAW/master/version.txt)"
+APPVERSION="$(__appversion "$REPORAW/master/version.txt")"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# dfmgr_install fontmgr_install iconmgr_install pkmgr_install systemmgr_install thememgr_install wallpapermgr_install
+# devenvmgr_install dfmgr_install dockermgr_install fontmgr_install iconmgr_install pkmgr_install systemmgr_install thememgr_install wallpapermgr_install
 
 systemmgr_install
 
@@ -74,25 +75,25 @@ CPAN=""
 GEMS=""
 
 # install packages - useful for package that have the same name on all oses
-install_packages $APP
+install_packages "$APP"
 
 # install required packages using file
-install_required $APP
+install_required "$APP"
 
 # check for perl modules and install using system package manager
-install_perl $PERL
+install_perl "$PERL"
 
 # check for python modules and install using system package manager
-install_python $PYTH
+install_python "$PYTH"
 
 # check for pip binaries and install using python package manager
-install_pip $PIPS
+install_pip "$PIPS"
 
 # check for cpan binaries and install using perl package manager
-install_cpan $CPAN
+install_cpan "$CPAN"
 
 # check for ruby binaries and install using ruby package manager
-install_gem $GEMS
+install_gem "$GEMS"
 
 # Other dependencies
 dotfilesreq
@@ -109,14 +110,17 @@ ensure_perms
 
 # Main progam
 
+if [ -d "$APPDIR" ]; then
+  execute "backupapp $APPDIR $APPNAME" "Backing up $APPDIR"
+fi
+
 if [ -d "$APPDIR/.git" ]; then
   execute \
-    "git_update $APPDIR" \
+    "git_update $INSTDIR" \
     "Updating $APPNAME configurations"
 else
   execute \
-    "backupapp && \
-        git_clone -q $REPO/$APPNAME $APPDIR" \
+    "git_clone $REPO/$APPNAME $INSTDIR" \
     "Installing $APPNAME configurations"
 fi
 
@@ -130,7 +134,7 @@ failexitcode
 run_postinst() {
   systemmgr_run_postinst
   if_os_id debian && replace "$APPDIR/nginx.conf" apache "www-data"
-  ln_sf "$APPDIR" "/etc/nginx"
+  cp_rf "$APPDIR"/. "/etc/nginx/"
   system_service_enable nginx
 }
 
