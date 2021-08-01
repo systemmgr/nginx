@@ -5,7 +5,7 @@ nginx is a shell designed for interactive use
 Automatic install/update:
 
 ```shell
-bash -c "$(curl -LSs https://github.com/systemmgr/nginx/raw/master/install.sh)"
+bash -c "$(curl -LSs https://github.com/systemmgr/nginx/raw/main/install.sh)"
 ```
 
 Manual install:

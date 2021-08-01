@@ -10,7 +10,7 @@ jobs:
       before_install: sudo apt-get update
 
 install:
-  - sudo bash -c "$(curl -LSs https://github.com/systemmgr/installer/raw/master/install.sh)" && systemmgr install installer
+  - sudo bash -c "$(curl -LSs https://github.com/systemmgr/installer/raw/main/install.sh)" && systemmgr install installer
   - systemmgr install nginx
   - sudo systemctl status nginx
 
