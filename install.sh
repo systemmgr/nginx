@@ -134,7 +134,8 @@ fi
 run_postinst() {
   systemmgr_run_post
   cp_rf "$APPDIR"/. "/etc/nginx/"
-  if_os_id debian && replace "$APPDIR/nginx.conf" "apache" "www-data"
+  if_os_id Debian && replace "$APPDIR/nginx.conf" "apache" "www-data"
+  if_os_id Arch && replace "$APPDIR/nginx.conf" "user  apache" "#user  apache"
   system_service_enable nginx
 }
 #
