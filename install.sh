@@ -135,7 +135,9 @@ run_postinst() {
   systemmgr_run_post
   cp_rf "$APPDIR"/. "/etc/nginx/"
   if_os_id Debian && replace "$APPDIR/nginx.conf" "apache" "www-data"
-  if_os_id Arch && replace "$APPDIR/nginx.conf" "user  apache" "#user  apache"
+  if_os_id Arch && replace "$APPDIR/nginx.conf" "user..*" "#user  apache"
+  replace "$APPDIR/nginx.conf" myserverdomainname "$(hostname -f 2>/dev/null)"
+  replace "$APPDIR/vhosts.d/0000-default.conf" myserverdomainname "$(hostname -f 2>/dev/null)"
   system_service_enable nginx
 }
 #
