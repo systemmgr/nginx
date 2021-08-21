@@ -133,11 +133,11 @@ fi
 # run post install scripts
 run_postinst() {
   systemmgr_run_post
+  if_os_id Debian && sed_replace "apache" "www-data" "$APPDIR/nginx.conf"
+  if_os_id Arch && sed_replace "user..*" "#user  apache" "$APPDIR/nginx.conf"
+  sed_replace myserverdomainname "$(hostname -f 2>/dev/null)" "$APPDIR/nginx.conf"
+  sed_replace myserverdomainname "$(hostname -f 2>/dev/null)" "$APPDIR/vhosts.d/0000-default.conf"
   cp_rf "$APPDIR"/. "/etc/nginx/"
-  if_os_id Debian && replace "$APPDIR/nginx.conf" "apache" "www-data"
-  if_os_id Arch && replace "$APPDIR/nginx.conf" "user..*" "#user  apache"
-  replace "$APPDIR/nginx.conf" myserverdomainname "$(hostname -f 2>/dev/null)"
-  replace "$APPDIR/vhosts.d/0000-default.conf" myserverdomainname "$(hostname -f 2>/dev/null)"
   system_service_enable nginx
 }
 #
