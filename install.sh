@@ -140,8 +140,8 @@ run_postinst() {
   #sed_replace myserverdomainname "$(hostname -f 2>/dev/null)" "$APPDIR/vhosts.d/0000-default.conf"
   if_os_id debian && sed_replace "apache" "www-data" "/etc/nginx/nginx.conf"
   if_os_id arch && sed_replace "user  apache" "#user  apache" "/etc/nginx/nginx.conf"
-  if_os-id arch && sed_replace "pid    " "#pid    " "/etc/nginx/nginx.conf"
-  if_os-id arch && echo "arch $distro_id true" || echo "arch $distro_id false"
+  if_os_id arch && sed_replace "pid    " "#pid    " "/etc/nginx/nginx.conf"
+  if_os_id arch && echo "arch $distro_id true" || echo "arch $distro_id false"
   sed_replace myserverdomainname "$(hostname -f 2>/dev/null)" "/etc/nginx/nginx.conf"
   sed_replace myserverdomainname "$(hostname -f 2>/dev/null)" "/etc/nginx/vhosts.d/0000-default.conf"
   system_service_enable nginx
