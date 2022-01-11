@@ -134,10 +134,6 @@ fi
 run_postinst() {
   systemmgr_run_post
   cp_rf "$APPDIR"/. "/etc/nginx/"
-  #if_os_id Debian && sed_replace "apache" "www-data" "$APPDIR/nginx.conf"
-  #if_os_id Arch && sed_replace "user..*" "#user  apache" "$APPDIR/nginx.conf"
-  #sed_replace myserverdomainname "$(hostname -f 2>/dev/null)" "$APPDIR/nginx.conf"
-  #sed_replace myserverdomainname "$(hostname -f 2>/dev/null)" "$APPDIR/vhosts.d/0000-default.conf"
   if_os_id debian && sed_replace "apache" "www-data" "/etc/nginx/nginx.conf"
   if_os_id arch && sed_replace "user  apache" "#user  apache" "/etc/nginx/nginx.conf"
   if_os_id arch && sed_replace "pid    " "#pid    " "/etc/nginx/nginx.conf"
