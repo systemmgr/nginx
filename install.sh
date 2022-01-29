@@ -140,6 +140,7 @@ run_postinst() {
   if_os_id debian && sed_replace "apache" "www-data" "/etc/nginx/nginx.conf"
   if_os_id arch && sed_replace "pid    " "#pid    " "/etc/nginx/nginx.conf"
   if_os_id arch && sed_replace "user  apache" "#user  apache" "/etc/nginx/nginx.conf"
+  cmd_exists changeip && changeip &>/dev/null
   system_service_enable nginx
 }
 #
