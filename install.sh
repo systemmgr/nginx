@@ -142,9 +142,9 @@ run_postinst() {
   if_os_id arch && sed_replace "user  apache" "#user  apache" "/etc/nginx/nginx.conf"
   cmd_exists changeip && changeip &>/dev/null
   if [ -z "$(type -P httpd || type -p "apache2" || type -P apachectl || false)" ]; then
-    [ -f "/etc/vhosts.d/0000-default.conf" ] && rm -Rf "/etc/vhosts.d/0000-default.conf"
+    [ -f "/etc/nginx/vhosts.d/0000-default.conf" ] && rm -Rf "/etc/nginx/vhosts.d/0000-default.conf"
     for f in apache-defaults.conf cgi-bin.conf munin.conf others.conf transmission.conf vnstats.conf; do
-      [ -f "/etc/global.d/$f" ] && rm -Rf "/etc/global.d/$f"
+      [ -f "/etc/nginx/global.d/$f" ] && rm -Rf "/etc/nginx/global.d/$f"
     done
   fi
   systemctl enable --now nginx >/dev/null && systemctl restart nginx >/dev/null
