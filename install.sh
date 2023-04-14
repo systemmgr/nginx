@@ -131,17 +131,21 @@ if am_i_online; then
 fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # run post install scripts
+# shellcheck disable=SC2317
 run_postinst() {
   systemmgr_run_post
+  ipaddr="${CURRIP4:-10.0.20.1}"
+  hostname="$(hostname -f 2>/dev/null)"
+  apache_bin="$(type -P httpd || type -p "apache2" || type -P apachectl || false)"
   cp_rf "$APPDIR"/. "/etc/nginx/"
-  sed_replace myserverdomainname "${CURRIP4:-10.0.20.1}" "/etc/nginx/conf.d/default.conf"
-  sed_replace myserverdomainname "$(hostname -f 2>/dev/null)" "/etc/nginx/nginx.conf"
-  sed_replace myserverdomainname "$(hostname -f 2>/dev/null)" "/etc/nginx/vhosts.d/0000-default.conf"
-  if_os_id debian && sed_replace "apache" "www-data" "/etc/nginx/nginx.conf"
-  if_os_id arch && sed_replace "pid    " "#pid    " "/etc/nginx/nginx.conf"
-  if_os_id arch && sed_replace "user  apache" "#user  apache" "/etc/nginx/nginx.conf"
+  if_os_id arch && sed -i "s|^pid    |#pid    |g" "/etc/nginx/nginx.conf"
+  if_os_id arch && sed -i "s|^user.*apache|#user  http|g" "/etc/nginx/nginx.conf"
+  if_os_id debian && sed -i "s|^user.*apache|user  www-data|g" "/etc/nginx/nginx.conf"
+  sed_replace myserverdomainname "$ipaddr" "/etc/nginx/conf.d/default.conf"
+  sed_replace myserverdomainname "$hostname" "/etc/nginx/nginx.conf"
+  sed_replace myserverdomainname "$hostname" "/etc/nginx/vhosts.d/0000-default.conf"
   cmd_exists changeip && changeip &>/dev/null
-  if [ -z "$(type -P httpd || type -p "apache2" || type -P apachectl || false)" ]; then
+  if [ -z "$apache_bin" ]; then
     [ -f "/etc/nginx/vhosts.d/0000-default.conf" ] && rm -Rf "/etc/nginx/vhosts.d/0000-default.conf"
     for f in apache-defaults.conf cgi-bin.conf munin.conf others.conf transmission.conf vnstats.conf; do
       [ -f "/etc/nginx/global.d/$f" ] && rm -Rf "/etc/nginx/global.d/$f"
