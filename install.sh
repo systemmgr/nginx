@@ -134,14 +134,14 @@ fi
 # shellcheck disable=SC2317
 run_postinst() {
   systemmgr_run_post
-  ipaddr="${CURRIP4:-10.0.20.1}"
+  ipaddr="${CURRENT_IP_4:-10.0.20.1}"
   hostname="$(hostname -f 2>/dev/null)"
   apache_bin="$(type -P httpd || type -p "apache2" || type -P apachectl || false)"
   cp_rf "$APPDIR"/. "/etc/nginx/"
   if_os_id arch && sed -i "s|^pid    |#pid    |g" "/etc/nginx/nginx.conf"
   if_os_id arch && sed -i "s|^user.*apache|#user  http|g" "/etc/nginx/nginx.conf"
   if_os_id debian && sed -i "s|^user.*apache|user  www-data|g" "/etc/nginx/nginx.conf"
-  sed_replace myserverdomainname "$ipaddr" "/etc/nginx/conf.d/default.conf"
+  sed_replace myserverip "$ipaddr" "/etc/nginx/conf.d/default.conf"
   sed_replace myserverdomainname "$hostname" "/etc/nginx/nginx.conf"
   sed_replace myserverdomainname "$hostname" "/etc/nginx/vhosts.d/0000-default.conf"
   cmd_exists changeip && changeip &>/dev/null
