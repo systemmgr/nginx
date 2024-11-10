@@ -147,15 +147,15 @@ run_postinst() {
   sed_replace myserverdomainname "$hostname" "/etc/nginx/vhosts.d/0000-default.conf"
   cmd_exists changeip && changeip &>/dev/null
   if [ -z "$(__type transmission || __type transmission-daemon || __type transmission-gtk)" ]; then
-    sed -i "/transmission.conf/d" '/etc/nginx/vhosts.d'/*
+    sed -i "/transmission.conf/d" '/etc/nginx/vhosts.d'/* 2>/dev/null
     [ -f "/etc/nginx/global.d/transmission.conf" ] && rm -Rf "/etc/nginx/global.d/transmission.conf"
   fi
   if [ -z "$apache_bin" ]; then
     [ -f "/etc/nginx/vhosts.d/0000-default.conf" ] && rm -Rf "/etc/nginx/vhosts.d/0000-default.conf"
     for f in apache-defaults.conf cgi-bin.conf munin.conf others.conf vnstats.conf; do
       [ -f "/etc/nginx/global.d/$f" ] && rm -Rf "/etc/nginx/global.d/$f"
-      sed -i "/$f/d" '/etc/nginx.conf'
-      sed -i "/$f/d" '/etc/nginx/vhosts.d'/*
+      sed -i "/$f/d" "/etc/nginx.conf" 2>/dev/null
+      sed -i "/$f/d" "/etc/nginx/vhosts.d"/* 2>/dev/null
     done
   fi
   systemctl enable --now nginx >/dev/null && systemctl restart nginx >/dev/null
