@@ -137,6 +137,7 @@ run_postinst() {
   ipaddr="${CURRENT_IP_4:-127.0.0.0.1}"
   hostname="$(hostname -f 2>/dev/null)"
   apache_bin="$(type -P httpd || type -p "apache2" || type -P apachectl || false)"
+  __type() { type -P "$1" 2>/dev/null; }
   cp_rf "$APPDIR"/. "/etc/nginx/"
   if_os_id arch && sed -i "s|^pid    |#pid    |g" "/etc/nginx/nginx.conf"
   if_os_id arch && sed -i "s|^user.*apache|#user  http|g" "/etc/nginx/nginx.conf"
@@ -145,10 +146,16 @@ run_postinst() {
   sed_replace myserverdomainname "$hostname" "/etc/nginx/nginx.conf"
   sed_replace myserverdomainname "$hostname" "/etc/nginx/vhosts.d/0000-default.conf"
   cmd_exists changeip && changeip &>/dev/null
+  if [ -z "$(__type transmission || __type transmission-daemon || __type transmission-gtk)" ]; then
+    sed -i "/transmission.conf/d" '/etc/nginx/vhosts.d'/*
+    [ -f "/etc/nginx/global.d/transmission.conf" ] && rm -Rf "/etc/nginx/global.d/transmission.conf"
+  fi
   if [ -z "$apache_bin" ]; then
     [ -f "/etc/nginx/vhosts.d/0000-default.conf" ] && rm -Rf "/etc/nginx/vhosts.d/0000-default.conf"
-    for f in apache-defaults.conf cgi-bin.conf munin.conf others.conf transmission.conf vnstats.conf; do
+    for f in apache-defaults.conf cgi-bin.conf munin.conf others.conf vnstats.conf; do
       [ -f "/etc/nginx/global.d/$f" ] && rm -Rf "/etc/nginx/global.d/$f"
+      sed -i "/$f/d" '/etc/nginx.conf'
+      sed -i "/$f/d" '/etc/nginx/vhosts.d'/*
     done
   fi
   systemctl enable --now nginx >/dev/null && systemctl restart nginx >/dev/null
