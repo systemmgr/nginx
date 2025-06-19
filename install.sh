@@ -138,6 +138,19 @@ run_postinst() {
   hostname="$(hostname -f 2>/dev/null)"
   apache_bin="$(type -P httpd || type -p "apache2" || type -P apachectl || false)"
   __type() { type -P "$1" 2>/dev/null; }
+  __get_www_user() {
+    local user=""
+    user="$(grep -sh "www-data" "/etc/passwd" || grep -sh "apache" "/etc/passwd" || grep -sh "nginx" "/etc/passwd")"
+    [ -n "$user" ] && echo "$user" | awk -F ':' '{print $1}' || return 9
+  }
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  __get_www_group() {
+    local group=""
+    group="$(grep -sh "www-data" "/etc/group" || grep -sh "apache" "/etc/group" || grep -sh "nginx" "/etc/group")"
+    [ -n "$group" ] && echo "$group" | awk -F ':' '{print $1}' || return 9
+  }
+  GET_WEB_USER="$(__get_www_user)"
+  GET_WEB_GROUP="$(__get_www_group)"
   cp_rf "$APPDIR"/. "/etc/nginx/"
   if_os_id arch && sed -i "s|^pid    |#pid    |g" "/etc/nginx/nginx.conf"
   if_os_id arch && sed -i "s|^user.*apache|#user  http|g" "/etc/nginx/nginx.conf"
@@ -156,6 +169,36 @@ run_postinst() {
       [ -f "/etc/nginx/global.d/$f" ] && rm -Rf "/etc/nginx/global.d/$f"
       sed -i "/$f/d" "/etc/nginx.conf" 2>/dev/null
       sed -i "/$f/d" "/etc/nginx/vhosts.d"/* 2>/dev/null
+    done
+  fi
+  if [ -n "$GET_WEB_USER" ]; then
+    if [ -f "/etc/nginx/nginx.conf" ]; then
+      sed -i '0,/^user .*/s//user  '$GET_WEB_USER';/' "/etc/nginx/nginx.conf"
+      grep -sqh "^user  $GET_WEB_USER" "/etc/nginx/nginx.conf" || echo "Failed to change the user in /etc/nginx/nginx.conf"
+    fi
+    if [ -f "/etc/php-fpm.d/www.conf" ]; then
+      sed -i '0,/^user .*/s//user = '$GET_WEB_USER'/' "/etc/php-fpm.d/www.conf"
+      grep -sqh "^user = $GET_WEB_USER" "/etc/php-fpm.d/www.conf" || echo "Failed to change the user in /etc/php-fpm.d/www.conf"
+    fi
+    if [ -f "/etc/httpd/conf/httpd.conf" ]; then
+      sed -i '0,/^User .*/s//User '$GET_WEB_USER'/' "/etc/httpd/conf/httpd.conf"
+      grep -sqh "^User $GET_WEB_USER" "/etc/httpd/conf/httpd.conf" || echo "Failed to change the user in /etc/httpd/conf/httpd.conf"
+    fi
+    for apache_dir in "/usr/local/share/httpd" "/var/www"; do
+      [ -d "$apache_dir" ] && chown -Rf $GET_WEB_USER "$apache_dir"
+    done
+  fi
+  if [ -n "$GET_WEB_GROUP" ]; then
+    if [ -f "/etc/php-fpm.d/www.conf" ]; then
+      sed -i '0,/^group .*/s//group = '$GET_WEB_GROUP'/' "/etc/php-fpm.d/www.conf"
+      grep -sqh "^group = $GET_WEB_GROUP" "/etc/php-fpm.d/www.conf" || echo "Failed to change the group in /etc/php-fpm.d/www.conf"
+    fi
+    if [ -f "/etc/httpd/conf/httpd.conf" ]; then
+      sed -i '0,/^Group .*/s//Group '$GET_WEB_GROUP'/' "/etc/httpd/conf/httpd.conf"
+      grep -sqh "^Group $GET_WEB_GROUP" "/etc/httpd/conf/httpd.conf" || echo "Failed to change the group in /etc/httpd/conf/httpd.conf"
+    fi
+    for apache_dir in "/usr/local/share/httpd" "/var/www"; do
+      [ -d "$apache_dir" ] && chgrp -Rf $GET_WEB_GROUP "$apache_dir"
     done
   fi
   systemctl enable --now nginx >/dev/null && systemctl restart nginx >/dev/null
